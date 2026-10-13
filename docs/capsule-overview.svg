@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="900" viewBox="0 0 1280 900" role="img" aria-labelledby="title description">
+  <title id="title">Capsule desktop app overview</title>
+  <desc id="description">An illustration of Capsule's compact desktop pill, today's task list, centered healthy break reminder, and recent task and health history.</desc>
+  <defs>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="160%">
+      <feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#263b32" flood-opacity=".11"/>
+    </filter>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto">
+      <path d="M1 1 6 4 1 7" fill="none" stroke="#9eb1a4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect width="1280" height="900" fill="#f5f7f3"/>
+  <circle cx="1168" cy="88" r="168" fill="#eaf0e9"/>
+  <circle cx="78" cy="825" r="155" fill="#edf1eb"/>
+  <rect x="64" y="48" width="36" height="36" rx="18" fill="#5f806b"/>
+  <path d="M75 66h14" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  <text x="115" y="77" fill="#30473a" font-family="Segoe UI, Arial, sans-serif" font-size="32" font-weight="700">Capsule</text>
+  <text x="64" y="126" fill="#405649" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600">Tasks and healthy breaks, in a tiny desktop companion.</text>
+  <text x="64" y="160" fill="#778a7b" font-family="Segoe UI, Arial, sans-serif" font-size="17">Local-first · No account · Always close at hand</text>
+
+  <text x="92" y="248" fill="#829387" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="2">GLANCE</text>
+  <rect x="84" y="275" width="205" height="60" rx="30" fill="#fbfcfa" stroke="#dfe8de" filter="url(#shadow)"/>
+  <path d="M116 305c7-9 19-9 26 0-7 9-19 9-26 0Z" fill="none" stroke="#60816b" stroke-width="2"/>
+  <circle cx="129" cy="305" r="3.5" fill="#60816b"/>
+  <text x="152" y="311" fill="#3e5145" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="600">18m</text>
+  <path d="M211 293v24" stroke="#dce5dd"/>
+  <text x="229" y="311" fill="#3e5145" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="600">3/5</text>
+  <text x="92" y="367" fill="#819287" font-family="Segoe UI, Arial, sans-serif" font-size="15">A small pill at the screen edge.</text>
+
+  <path d="M306 305h56" fill="none" stroke="#9eb1a4" stroke-width="2" stroke-dasharray="5 6" marker-end="url(#arrow)"/>
+
+  <text x="386" y="215" fill="#829387" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="2">ONE CLICK</text>
+  <rect x="376" y="236" width="327" height="405" rx="24" fill="#fbfcfa" stroke="#dfe8de" filter="url(#shadow)"/>
+  <text x="400" y="277" fill="#87988b" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="2">TODAY</text>
+  <text x="649" y="277" fill="#4c6252" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600">3 / 5</text>
+  <line x1="400" y1="293" x2="679" y2="293" stroke="#e8eee7"/>
+
+  <rect x="400" y="314" width="19" height="19" rx="6" fill="#eaf3eb" stroke="#93b39c"/>
+  <path d="m405 323 4 4 6-8" fill="none" stroke="#608b6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="433" y="329" fill="#9aaa9d" font-family="Segoe UI, Arial, sans-serif" font-size="16" text-decoration="line-through">Review presentation</text>
+  <rect x="400" y="355" width="19" height="19" rx="6" fill="#eaf3eb" stroke="#93b39c"/>
+  <path d="m405 364 4 4 6-8" fill="none" stroke="#608b6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="433" y="370" fill="#9aaa9d" font-family="Segoe UI, Arial, sans-serif" font-size="16" text-decoration="line-through">Reply to email</text>
+  <rect x="400" y="396" width="19" height="19" rx="6" fill="#eaf3eb" stroke="#93b39c"/>
+  <path d="m405 405 4 4 6-8" fill="none" stroke="#608b6c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="433" y="411" fill="#9aaa9d" font-family="Segoe UI, Arial, sans-serif" font-size="16" text-decoration="line-through">Write memo</text>
+  <rect x="400" y="437" width="19" height="19" rx="6" fill="#fff" stroke="#a9b8ab"/>
+  <text x="433" y="452" fill="#405247" font-family="Segoe UI, Arial, sans-serif" font-size="16">Read paper</text>
+  <rect x="400" y="478" width="19" height="19" rx="6" fill="#fff" stroke="#a9b8ab"/>
+  <text x="433" y="493" fill="#405247" font-family="Segoe UI, Arial, sans-serif" font-size="16">Take a walk</text>
+  <text x="400" y="542" fill="#648471" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600">＋ Add task</text>
+  <line x1="400" y1="560" x2="679" y2="560" stroke="#e8eee7"/>
+  <text x="400" y="586" fill="#85998a" font-family="Segoe UI, Arial, sans-serif" font-size="14">Eye 18m</text>
+  <text x="494" y="586" fill="#85998a" font-family="Segoe UI, Arial, sans-serif" font-size="14">Water 32m</text>
+  <text x="599" y="586" fill="#85998a" font-family="Segoe UI, Arial, sans-serif" font-size="14">Stand 48m</text>
+  <text x="400" y="620" fill="#698273" font-family="Segoe UI, Arial, sans-serif" font-size="13">History</text>
+  <text x="622" y="620" fill="#698273" font-family="Segoe UI, Arial, sans-serif" font-size="13">Settings</text>
+
+  <path d="M720 374h50" fill="none" stroke="#9eb1a4" stroke-width="2" stroke-dasharray="5 6" marker-end="url(#arrow)"/>
+  <text x="792" y="248" fill="#829387" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="2">A GENTLE NUDGE</text>
+  <rect x="782" y="275" width="408" height="227" rx="24" fill="#fbfcfa" stroke="#d4ded3" filter="url(#shadow)"/>
+  <circle cx="825" cy="318" r="21" fill="#edf3ec"/>
+  <path d="M813 318c6-8 18-8 24 0-6 8-18 8-24 0Z" fill="none" stroke="#5f806b" stroke-width="2"/>
+  <circle cx="825" cy="318" r="3" fill="#5f806b"/>
+  <text x="858" y="325" fill="#3d5144" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="600">Eye break</text>
+  <text x="811" y="377" fill="#728477" font-family="Segoe UI, Arial, sans-serif" font-size="16">Look away from the screen for 20 seconds.</text>
+  <rect x="811" y="420" width="164" height="47" rx="13" fill="#e9f2e9"/>
+  <text x="867" y="449" fill="#4f765a" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="600">Done</text>
+  <rect x="988" y="420" width="173" height="47" rx="13" fill="#f4f6f2" stroke="#dce6db"/>
+  <text x="1019" y="449" fill="#6d826f" font-family="Segoe UI, Arial, sans-serif" font-size="16">10m later</text>
+  <text x="792" y="540" fill="#819287" font-family="Segoe UI, Arial, sans-serif" font-size="15">Reminders appear without a full app window.</text>
+
+  <path d="M718 618h40v88h15" fill="none" stroke="#9eb1a4" stroke-width="2" stroke-dasharray="5 6" marker-end="url(#arrow)"/>
+  <text x="792" y="585" fill="#829387" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="2">LOOK BACK</text>
+  <rect x="782" y="606" width="408" height="235" rx="24" fill="#fbfcfa" stroke="#dfe8de" filter="url(#shadow)"/>
+  <text x="810" y="643" fill="#3d5144" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600">History</text>
+  <text x="1100" y="641" fill="#728477" font-family="Segoe UI, Arial, sans-serif" font-size="13">Last 7 days</text>
+  <line x1="810" y1="656" x2="1162" y2="656" stroke="#e8eee7"/>
+  <text x="810" y="683" fill="#526958" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600">Oct 13</text>
+  <text x="810" y="703" fill="#839486" font-family="Segoe UI, Arial, sans-serif" font-size="13">Tasks 4/5</text>
+  <text x="1018" y="703" fill="#839486" font-family="Segoe UI, Arial, sans-serif" font-size="13">Health 15/17</text>
+  <line x1="810" y1="714" x2="1162" y2="714" stroke="#edf1eb"/>
+  <text x="810" y="740" fill="#526958" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600">Oct 12</text>
+  <text x="810" y="760" fill="#839486" font-family="Segoe UI, Arial, sans-serif" font-size="13">Tasks 5/5</text>
+  <text x="1018" y="760" fill="#839486" font-family="Segoe UI, Arial, sans-serif" font-size="13">Health 14/16</text>
+  <line x1="810" y1="771" x2="1162" y2="771" stroke="#edf1eb"/>
+  <text x="810" y="797" fill="#526958" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600">Oct 11</text>
+  <text x="810" y="817" fill="#839486" font-family="Segoe UI, Arial, sans-serif" font-size="13">Tasks 3/4</text>
+  <text x="1018" y="817" fill="#839486" font-family="Segoe UI, Arial, sans-serif" font-size="13">Health 12/15</text>
+
+  <line x1="64" y1="866" x2="1216" y2="866" stroke="#dfe8de"/>
+  <text x="64" y="890" fill="#8b9b8e" font-family="Segoe UI, Arial, sans-serif" font-size="12">Concept illustration · Capsule v0.1 · Built with Tauri, React, Rust, and SQLite</text>
+</svg>
