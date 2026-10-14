@@ -46,8 +46,8 @@ pub fn run() {
             commands::update_reminder_rule,
             commands::update_quiet_hours,
             commands::update_attention_settings,
-            commands::complete_reminder,
-            commands::snooze_reminder,
+            commands::complete_reminders,
+            commands::snooze_reminders,
             commands::get_history
         ])
         .run(tauri::generate_context!())

@@ -56,6 +56,7 @@ pub struct ReminderSnapshot {
     pub attention_sound: bool,
     pub attention_repeat: bool,
     pub attention_visible: bool,
+    pub attention_event_ids: Vec<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]

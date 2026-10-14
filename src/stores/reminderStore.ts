@@ -10,8 +10,8 @@ type ReminderState = {
   updateRule: (rule: ReminderRule, enabled: boolean, intervalMinutes: number, snoozeMinutes: number) => Promise<void>;
   updateQuiet: (start: string, end: string) => Promise<void>;
   updateAttention: (sound: boolean, repeat: boolean) => Promise<void>;
-  complete: (id: string) => Promise<boolean>;
-  snooze: (id: string) => Promise<boolean>;
+  complete: (ids: string[]) => Promise<boolean>;
+  snooze: (ids: string[]) => Promise<boolean>;
 };
 
 function message(error: unknown): string {
@@ -44,12 +44,12 @@ export const useReminderStore = create<ReminderState>((set, get) => ({
       await get().refresh();
     } catch (error) { set({ error: message(error) }); }
   },
-  complete: async (id) => {
-    try { await api.completeReminder(id); await get().refresh(); return true; }
+  complete: async (ids) => {
+    try { await api.completeReminders(ids); await get().refresh(); return true; }
     catch (error) { set({ error: message(error) }); return false; }
   },
-  snooze: async (id) => {
-    try { await api.snoozeReminder(id); await get().refresh(); return true; }
+  snooze: async (ids) => {
+    try { await api.snoozeReminders(ids); await get().refresh(); return true; }
     catch (error) { set({ error: message(error) }); return false; }
   },
 }));

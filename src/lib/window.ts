@@ -1,9 +1,9 @@
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
-export async function resizeCapsule(mode: string): Promise<void> {
+export async function resizeCapsule(mode: string, grouped = false): Promise<void> {
   if (isTauri()) {
-    await invoke("set_capsule_mode", { mode });
+    await invoke("set_capsule_mode", { mode, grouped });
   }
 }
 

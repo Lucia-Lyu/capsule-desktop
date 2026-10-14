@@ -20,6 +20,7 @@ Capsule 是一款常驻屏幕边缘的轻量级桌面工具，将每日待办与
 - 添加、完成、取消完成、删除和排序当天任务。任务保存在 SQLite 中，可在历史记录中查看。
 - 手动将未完成任务顺延到次日，或从过去的日期逐条带入今天（也可一键全部带入）。新日期的任务副本会标记原始创建日期，旧记录仍保留。
 - Rust 后台分别调度护眼、喝水和起身提醒。胶囊收起时计时仍继续；完成和稍后提醒会记录为事件。
+- 护眼与起身相差不超过 10 分钟时，在较晚的到期时间合并成一张卡片；喝水仍独立提醒。合并卡片可一次完成两项，或按两者较长的稍后时长一起推迟。
 - 提醒到期时，在胶囊所在屏幕中央显示小卡片并播放 Windows 系统提示音。卡片 10 秒后收起，并可在 90 秒后再次提示；可在设置中关闭声音和重复提示，免打扰时段也会抑制它们。
 - 修改提醒间隔、稍后提醒时长和免打扰时段，无需重启应用。睡眠唤醒或免打扰结束后，不会集中补发错过的提醒。
 - 查看今天、最近 7 天或最近 30 天的任务与健康提醒完成情况，以及每日详情和完成率。
@@ -77,11 +78,11 @@ Rust 负责原生窗口、SQLite、提醒调度及屏幕中央提醒卡片的触
 
 ### 路线图
 
-- **v0.1：** 悬浮胶囊、待办、手动顺延、健康提醒、历史记录、配色主题。
-- **v0.2：** 提醒合并、空闲检测、热力图、键盘快捷键。
+- **v0.1：** 悬浮胶囊、待办、手动顺延、健康提醒、护眼与起身合并、历史记录、配色主题。
+- **v0.2：** 空闲检测、热力图、键盘快捷键。
 - **v0.3：** 全屏检测、顺延体验完善。
 
-窗口位置保存、边缘吸附和开机启动仍属于桌面体验完善工作。提醒合并、空闲检测和热力图尚未包含在 v0.1 中。
+窗口位置保存、边缘吸附和开机启动仍属于桌面体验完善工作。空闲检测和热力图尚未包含在 v0.1 中。
 
 ## English
 
@@ -99,6 +100,7 @@ Capsule is a small, local desktop companion that lives near the edge of the scre
 - Add, complete, uncomplete, delete, and reorder today's tasks. Tasks are stored in SQLite and remain available in history.
 - Manually continue an unfinished task to tomorrow, or bring individual unfinished tasks from earlier days into today (with a Bring all shortcut). Each new daily copy shows the original creation date; earlier daily records stay in history.
 - Rust schedules independent Eye, Water, and Stand reminders even while the capsule is collapsed. Done and Snooze are recorded as events.
+- Eye and Stand reminders due within ten minutes appear together at the later deadline; Water stays independent. A paired card can complete both or snooze them together for the longer configured delay.
 - When a reminder is due, a compact card appears at the center of the capsule's monitor with a Windows system chime. It retracts after ten seconds and can appear once more after ninety seconds. Sound and repeat can be disabled in Settings; quiet hours suppress both.
 - Change intervals, snooze lengths, and quiet hours without restarting. Missed reminders are not replayed after sleep or quiet hours.
 - Browse today, seven days, or thirty days of task and reminder completion, with daily details and rates.
@@ -157,8 +159,8 @@ The database is `capsule.sqlite3` in Tauri's standard app data directory. Versio
 
 ### Roadmap
 
-- **v0.1:** Capsule, Todo, manual task carry, Reminder, History, color themes.
-- **v0.2:** Reminder merge, idle detection, heatmap, keyboard shortcut.
+- **v0.1:** Capsule, Todo, manual task carry, Reminder, Eye/Stand merge, History, color themes.
+- **v0.2:** Idle detection, heatmap, keyboard shortcut.
 - **v0.3:** Fullscreen detection and carry-over polish.
 
-Window position persistence, edge snapping, and launch at startup remain desktop-polish work. Reminder merging, idle detection, and the heatmap remain outside v0.1.
+Window position persistence, edge snapping, and launch at startup remain desktop-polish work. Idle detection and the heatmap remain outside v0.1.

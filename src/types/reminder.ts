@@ -29,4 +29,5 @@ export type ReminderSnapshot = {
   attentionSound: boolean;
   attentionRepeat: boolean;
   attentionVisible: boolean;
+  attentionEventIds: string[];
 };

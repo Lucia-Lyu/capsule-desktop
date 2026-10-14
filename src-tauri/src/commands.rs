@@ -11,12 +11,12 @@ use crate::{
 };
 
 #[tauri::command]
-pub fn set_capsule_mode(window: WebviewWindow, mode: String, attention: State<'_, Attention>, app: AppHandle) -> Result<(), String> {
+pub fn set_capsule_mode(window: WebviewWindow, mode: String, grouped: bool, attention: State<'_, Attention>, app: AppHandle) -> Result<(), String> {
     if mode == "collapsed" && attention.dismiss(&app)? { return Ok(()); }
     let (width, height) = match mode.as_str() {
         "collapsed" => (110, 32),
         "expanded" => (280, 360),
-        "reminder" => (280, 140),
+        "reminder" => (280, if grouped { 180 } else { 140 }),
         "history" | "settings" => (320, 440),
         _ => return Err("Unknown capsule mode".into()),
     };
@@ -115,6 +115,7 @@ pub fn get_reminder_snapshot(
 ) -> Result<ReminderSnapshot, String> {
     let mut snapshot = scheduler.snapshot(&database)?;
     snapshot.attention_visible = attention.visible()?;
+    snapshot.attention_event_ids = attention.visible_ids()?;
     Ok(snapshot)
 }
 
@@ -131,7 +132,7 @@ pub fn update_reminder_rule(
 ) -> Result<(), String> {
     let rule = database.update_reminder_rule(&id, enabled, interval_minutes, snooze_minutes)?;
     scheduler.update_rule(&database, rule)?;
-    attention.resolved(&app, !database.active_reminder_events()?.is_empty())?;
+    attention.resolved(&app, &database.active_reminder_events()?.into_iter().map(|event| event.id).collect::<Vec<_>>())?;
     let _ = app.emit("reminder://updated", ());
     Ok(())
 }
@@ -165,32 +166,34 @@ pub fn update_attention_settings(
 }
 
 #[tauri::command]
-pub fn complete_reminder(
-    id: String,
+pub fn complete_reminders(
+    ids: Vec<String>,
     database: State<'_, Database>,
     scheduler: State<'_, Scheduler>,
     attention: State<'_, Attention>,
     app: AppHandle,
 ) -> Result<(), String> {
-    let rule_id = database.complete_reminder(&id)?;
-    let rule = database.reminder_rule(&rule_id)?;
-    scheduler.complete(&rule_id, rule.interval_minutes)?;
-    attention.resolved(&app, !database.active_reminder_events()?.is_empty())?;
+    for rule_id in database.complete_reminders(&ids)? {
+        let rule = database.reminder_rule(&rule_id)?;
+        scheduler.complete(&rule_id, rule.interval_minutes)?;
+    }
+    attention.resolved(&app, &database.active_reminder_events()?.into_iter().map(|event| event.id).collect::<Vec<_>>())?;
     let _ = app.emit("reminder://updated", ());
     Ok(())
 }
 
 #[tauri::command]
-pub fn snooze_reminder(
-    id: String,
+pub fn snooze_reminders(
+    ids: Vec<String>,
     database: State<'_, Database>,
     scheduler: State<'_, Scheduler>,
     attention: State<'_, Attention>,
     app: AppHandle,
 ) -> Result<(), String> {
-    let (rule_id, until) = database.snooze_reminder(&id)?;
-    scheduler.snooze(&rule_id, &id, until)?;
-    attention.resolved(&app, !database.active_reminder_events()?.is_empty())?;
+    for (id, rule_id, until) in database.snooze_reminders(&ids)? {
+        scheduler.snooze(&rule_id, &id, until)?;
+    }
+    attention.resolved(&app, &database.active_reminder_events()?.into_iter().map(|event| event.id).collect::<Vec<_>>())?;
     let _ = app.emit("reminder://updated", ());
     Ok(())
 }

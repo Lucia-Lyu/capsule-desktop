@@ -24,7 +24,7 @@ export const api = {
     invoke<void>("update_quiet_hours", { start, end }),
   updateAttentionSettings: (sound: boolean, repeat: boolean) =>
     invoke<void>("update_attention_settings", { sound, repeat }),
-  completeReminder: (id: string) => invoke<void>("complete_reminder", { id }),
-  snoozeReminder: (id: string) => invoke<void>("snooze_reminder", { id }),
+  completeReminders: (ids: string[]) => invoke<void>("complete_reminders", { ids }),
+  snoozeReminders: (ids: string[]) => invoke<void>("snooze_reminders", { ids }),
   history: (days: 1 | 7 | 30) => invoke<HistoryDay[]>("get_history", { days }),
 };

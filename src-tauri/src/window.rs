@@ -2,6 +2,7 @@ use tauri::{LogicalSize, PhysicalPosition, PhysicalSize, WebviewWindow};
 
 const COLLAPSED_SIZE: (u32, u32) = (110, 32);
 const ATTENTION_SIZE: (u32, u32) = (280, 140);
+const GROUP_ATTENTION_SIZE: (u32, u32) = (280, 180);
 
 fn centered_position(
     monitor_position: PhysicalPosition<i32>,
@@ -31,12 +32,13 @@ fn collapsed_return_position(
     PhysicalPosition::new(x, old_position.y)
 }
 
-pub fn center_attention(window: &WebviewWindow) -> tauri::Result<PhysicalPosition<i32>> {
+pub fn center_attention(window: &WebviewWindow, reminder_count: usize) -> tauri::Result<PhysicalPosition<i32>> {
     let original = window.outer_position()?;
     let original_size = window.outer_size()?;
     let monitor = window.current_monitor()?.or(window.primary_monitor()?);
     let scale = monitor.as_ref().map(|monitor| monitor.scale_factor()).unwrap_or(window.scale_factor()?);
-    let size: PhysicalSize<u32> = LogicalSize::new(ATTENTION_SIZE.0, ATTENTION_SIZE.1).to_physical(scale);
+    let dimensions = if reminder_count > 1 { GROUP_ATTENTION_SIZE } else { ATTENTION_SIZE };
+    let size: PhysicalSize<u32> = LogicalSize::new(dimensions.0, dimensions.1).to_physical(scale);
     let collapsed_size: PhysicalSize<u32> = LogicalSize::new(COLLAPSED_SIZE.0, COLLAPSED_SIZE.1).to_physical(scale);
     let return_position = monitor.as_ref().map(|monitor| {
         collapsed_return_position(*monitor.position(), *monitor.size(), original, original_size, collapsed_size)

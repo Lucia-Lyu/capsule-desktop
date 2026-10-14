@@ -3,6 +3,7 @@ import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent }
 import { isTauri } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { onCapsuleFocusChanged, resizeCapsule, startCapsuleDrag } from "../../lib/window";
+import { selectedReminderEvents } from "../../lib/reminderGroup";
 import { useAppStore } from "../../stores/appStore";
 import type { CapsuleMode } from "../../stores/appStore";
 import { useTaskStore } from "../../stores/taskStore";
@@ -26,6 +27,7 @@ export function Capsule() {
   const tasks = useTaskStore((state) => state.tasks);
   const refreshTasks = useTaskStore((state) => state.refresh);
   const snapshot = useReminderStore((state) => state.snapshot);
+  const selectedReminders = selectedReminderEvents(snapshot);
   const refreshReminders = useReminderStore((state) => state.refresh);
   const refreshHistory = useHistoryStore((state) => state.refresh);
   const completed = tasks.filter((task) => task.status === "completed").length;
@@ -37,7 +39,7 @@ export function Capsule() {
     if (transitioning.current) return;
     transitioning.current = true;
     try {
-      await resizeCapsule(nextMode);
+      await resizeCapsule(nextMode, nextMode === "reminder" && selectedReminderEvents(useReminderStore.getState().snapshot).length > 1);
       setMode(nextMode);
     } catch (error) {
       console.error("Could not resize Capsule", error);
@@ -137,7 +139,7 @@ export function Capsule() {
     return <CapsuleCollapsed onClick={onCollapsedClick} onPointerDown={onPointerDown} onPointerMove={onPointerMove} completed={completed} total={tasks.length} rule={snapshot?.rules.find((rule) => rule.id === id)} nextAt={next?.nextTriggerAt} alert={Boolean(active)} />;
   }
   if (mode === "reminder") {
-    return snapshot?.active[0] ? <ReminderAlert event={snapshot.active[0]} onBack={() => void changeMode("collapsed")} /> : <CapsuleExpanded onCollapse={() => void changeMode("collapsed")} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onHistory={() => void changeMode("history")} onSettings={() => void changeMode("settings")} onReminder={() => void changeMode("reminder")} />;
+    return selectedReminders.length ? <ReminderAlert events={selectedReminders} onBack={() => void changeMode("collapsed")} /> : <CapsuleExpanded onCollapse={() => void changeMode("collapsed")} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onHistory={() => void changeMode("history")} onSettings={() => void changeMode("settings")} onReminder={() => void changeMode("reminder")} />;
   }
   if (mode === "settings") return <SettingsPanel onBack={() => void changeMode("expanded")} />;
   if (mode === "history") return <HistoryList onBack={() => void changeMode("expanded")} />;

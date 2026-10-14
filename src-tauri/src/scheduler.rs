@@ -9,6 +9,8 @@ use crate::{
     models::{NextReminder, ReminderRule, ReminderSnapshot},
 };
 
+const MERGE_MINUTES: i64 = 10;
+
 struct RuleTiming {
     next_at: Option<DateTime<Utc>>,
     active_event_id: Option<String>,
@@ -40,6 +42,36 @@ fn next_after(now: DateTime<Utc>, minutes: i64) -> DateTime<Utc> {
 
 fn resumed_after_sleep(last: DateTime<Utc>, now: DateTime<Utc>) -> bool {
     now - last > Duration::minutes(2) || now < last
+}
+
+fn merge_deadline(
+    eye: Option<DateTime<Utc>>,
+    stand: Option<DateTime<Utc>>,
+    quiet_start: NaiveTime,
+    quiet_end: NaiveTime,
+) -> Option<DateTime<Utc>> {
+    let (eye, stand) = (eye?, stand?);
+    let (earlier, later) = if eye <= stand { (eye, stand) } else { (stand, eye) };
+    let first_local = earlier.with_timezone(&Local);
+    let last_local = later.with_timezone(&Local);
+    if later - earlier > Duration::minutes(MERGE_MINUTES)
+        || first_local.date_naive() != last_local.date_naive()
+        || quiet_at(last_local.time(), quiet_start, quiet_end)
+    {
+        return None;
+    }
+    Some(later)
+}
+
+impl Engine {
+    fn pair_deadline(&self) -> Option<DateTime<Utc>> {
+        let enabled = |id| self.rules.iter().any(|rule| rule.id == id && rule.enabled);
+        if !enabled("eye") || !enabled("stand") { return None; }
+        let next = |id| self.timing.get(id).and_then(|timing| {
+            if timing.active_event_id.is_none() { timing.next_at } else { None }
+        });
+        merge_deadline(next("eye"), next("stand"), self.quiet_start, self.quiet_end)
+    }
 }
 
 impl Scheduler {
@@ -118,10 +150,27 @@ impl Scheduler {
             }
             let _ = app.emit("reminder://updated", ());
         }
-        let mut triggered = Vec::new();
+        let mut batches = Vec::new();
         if !quiet {
+            let pair_at = engine.pair_deadline();
+            if pair_at.is_some_and(|at| at <= now) {
+                let scheduled = ["eye", "stand"].iter().map(|id| {
+                    let timing = engine.timing.get(*id).ok_or("Reminder timing not found")?;
+                    let next_at = timing.next_at.ok_or("Paired reminder deadline missing")?;
+                    Ok((id.to_string(), next_at.to_rfc3339(), timing.snoozed_event_id.clone()))
+                }).collect::<DbResult<Vec<_>>>()?;
+                let pair = database.trigger_reminders(&scheduled)?;
+                for event in &pair {
+                    let timing = engine.timing.get_mut(&event.reminder_id).ok_or("Reminder timing not found")?;
+                    timing.next_at = None;
+                    timing.snoozed_event_id = None;
+                    timing.active_event_id = Some(event.id.clone());
+                }
+                batches.push(pair);
+            }
             for rule in &rules {
                 if !rule.enabled { continue; }
+                if pair_at.is_some() && (rule.id == "eye" || rule.id == "stand") { continue; }
                 let Some(timing) = engine.timing.get_mut(&rule.id) else { continue; };
                 let Some(next_at) = timing.next_at else { continue; };
                 if timing.active_event_id.is_some() || next_at > now { continue; }
@@ -129,25 +178,27 @@ impl Scheduler {
                 timing.next_at = None;
                 timing.snoozed_event_id = None;
                 timing.active_event_id = Some(event.id.clone());
-                triggered.push(event);
+                batches.push(vec![event]);
             }
         }
         let active = engine.timing.values().any(|timing| timing.active_event_id.is_some());
         drop(engine);
         attention.tick(app, now, active, quiet, reset)?;
-        for event in triggered {
-            let _ = app.emit("reminder://triggered", &event);
+        for batch in batches {
+            for event in &batch { let _ = app.emit("reminder://triggered", event); }
             let _ = app.emit("reminder://updated", ());
-            attention.triggered(app, now)?;
+            attention.triggered(app, now, batch.iter().map(|event| event.id.clone()).collect())?;
         }
         Ok(())
     }
 
     pub fn snapshot(&self, database: &Database) -> DbResult<ReminderSnapshot> {
         let engine = self.engine.lock().map_err(|error| error.to_string())?;
+        let pair_at = engine.pair_deadline();
         let mut next = engine.timing.iter().filter_map(|(id, timing)| {
             timing.next_at.map(|at| NextReminder {
-                reminder_id: id.clone(), next_trigger_at: at.to_rfc3339(),
+                reminder_id: id.clone(),
+                next_trigger_at: if id == "eye" || id == "stand" { pair_at.unwrap_or(at) } else { at }.to_rfc3339(),
             })
         }).collect::<Vec<_>>();
         next.sort_by(|a, b| a.next_trigger_at.cmp(&b.next_trigger_at));
@@ -160,6 +211,7 @@ impl Scheduler {
             attention_sound,
             attention_repeat,
             attention_visible: false,
+            attention_event_ids: Vec::new(),
         })
     }
 
@@ -261,10 +313,43 @@ mod tests {
         let db = Database::from_connection(Connection::open_in_memory().unwrap()).unwrap();
         db.set_quiet_hours("00:00", "00:00").unwrap();
         let event = db.trigger_reminder("eye", &Utc::now().to_rfc3339(), None).unwrap();
-        let (_, until) = db.snooze_reminder(&event.id).unwrap();
+        let (_, _, until) = db.snooze_reminders(&[event.id.clone()]).unwrap().remove(0);
         let restarted = Scheduler::new(&db).unwrap();
         let eye = restarted.snapshot(&db).unwrap().next.into_iter()
             .find(|next| next.reminder_id == "eye").unwrap();
         assert_eq!(eye.next_trigger_at, until.to_rfc3339());
+    }
+
+    #[test]
+    fn eye_and_stand_wait_for_the_later_deadline_within_ten_minutes() {
+        let eye = DateTime::parse_from_rfc3339("2026-10-14T14:30:00+08:00").unwrap().with_timezone(&Utc);
+        let stand = eye + Duration::minutes(2);
+        let no_quiet = NaiveTime::from_hms_opt(0, 0, 0).unwrap();
+        assert_eq!(merge_deadline(Some(eye), Some(stand), no_quiet, no_quiet), Some(stand));
+        assert_eq!(merge_deadline(Some(stand), Some(eye), no_quiet, no_quiet), Some(stand));
+        assert_eq!(merge_deadline(Some(eye), Some(eye + Duration::minutes(10)), no_quiet, no_quiet), Some(eye + Duration::minutes(10)));
+        assert_eq!(merge_deadline(Some(eye), Some(eye + Duration::minutes(11)), no_quiet, no_quiet), None);
+        assert_eq!(merge_deadline(Some(eye), None, no_quiet, no_quiet), None);
+        let quiet_start = stand.with_timezone(&Local).time();
+        let quiet_end = (stand + Duration::hours(1)).with_timezone(&Local).time();
+        assert_eq!(merge_deadline(Some(eye), Some(stand), quiet_start, quiet_end), None);
+    }
+
+    #[test]
+    fn countdown_uses_group_display_time_and_disabling_restores_independent_time() {
+        let db = Database::from_connection(Connection::open_in_memory().unwrap()).unwrap();
+        db.set_quiet_hours("00:00", "00:00").unwrap();
+        let scheduler = Scheduler::new(&db).unwrap();
+        let stand = db.update_reminder_rule("stand", true, 32, 10).unwrap();
+        scheduler.update_rule(&db, stand).unwrap();
+        let next = scheduler.snapshot(&db).unwrap().next;
+        let eye_at = next.iter().find(|item| item.reminder_id == "eye").unwrap().next_trigger_at.clone();
+        let stand_at = next.iter().find(|item| item.reminder_id == "stand").unwrap().next_trigger_at.clone();
+        assert_eq!(eye_at, stand_at);
+        let eye = db.update_reminder_rule("eye", false, 30, 10).unwrap();
+        scheduler.update_rule(&db, eye).unwrap();
+        let next = scheduler.snapshot(&db).unwrap().next;
+        assert!(!next.iter().any(|item| item.reminder_id == "eye"));
+        assert!(next.iter().any(|item| item.reminder_id == "stand"));
     }
 }
